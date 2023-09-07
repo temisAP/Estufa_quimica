@@ -154,9 +154,9 @@ void check_thermomodule(){
     elapsedTime = elapsedTime + millis()/1000;
     Serial.print("Temp: ");
     Serial.print(currentTemp);
-    Serial.print(" C ->");
+    Serial.print(" C -> ");
     Serial.print("Target Temp: ");
-    Serial.print(targetTemp);
+    Serial.print(targetTemp, 0);
     Serial.print(" C");
     Serial.print(" // ");
     Serial.print("Elapsed time: ");
@@ -173,10 +173,9 @@ void receive(){
         parseData();
         newData = false;
     }
-    targetTemp = floatFromPC;
     Serial.print("Temperature set at:");
-    Serial.print(targetTemp);
-    Serial.println("C");
+    Serial.print(targetTemp, 0);
+    Serial.println(" C");
   };
 
 
@@ -188,6 +187,7 @@ void receive(){
       char rc;
       while (Serial.available() > 0 && newData == false) {
           rc = Serial.read();
+          Serial.println(rc);
           if (recvInProgress == true) {
               if (rc != endMarker) {
                   receivedChars[ndx] = rc;
@@ -201,6 +201,7 @@ void receive(){
                   recvInProgress = false;
                   ndx = 0;
                   newData = true;
+                  // targetTemp = floatFromPC;
               }
           }
           else if (rc == startMarker) {
@@ -256,6 +257,7 @@ void decreaseTemperature() {
 }
 
 void updateDisplay() {
+  lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("T= ");
   lcd.print(currentTemp);
@@ -264,7 +266,7 @@ void updateDisplay() {
 
   lcd.setCursor(0, 1);
   lcd.print("Target: ");
-  lcd.print(targetTemp);
+  lcd.print(targetTemp, 0);
   lcd.print("C  ");
   
   lcd.setCursor(15, 1);
