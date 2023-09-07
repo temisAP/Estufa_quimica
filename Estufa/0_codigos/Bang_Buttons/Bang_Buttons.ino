@@ -29,7 +29,7 @@
 #define MAXCLK  5
 
 double currentTemp = 0;    // current temperature
-double targetTemp  = 0;     // target temperature ---> <valor temperatura en el display serial>
+double targetTemp  = 0;    // target temperature 
 Adafruit_MAX31855 thermocouple(MAXCLK, MAXCS, MAXDO);
 
 // Relay
@@ -103,20 +103,44 @@ void check_thermomodule(){
     while (!running) {
       double internal_temp = thermocouple.readInternal();
       if (internal_temp >= 125.0){
+        digitalWrite(relay, LOW);
         running = false;
+        
         Serial.println("Thermocouple module is overheated");
         Serial.print("Internal Temperature = ");
         Serial.println(internal_temp);
-        digitalWrite(relay, LOW);
         Serial.println("Relay turned off");
+
+        lcd.setCursor(0, 0);
+        lcd.print("Module overheated");
+
+        lcd.setCursor(0, 1);
+        lcd.print("Tint=");
+        lcd.print(internal_temp);
+        lcd.print("C;  ");
+        lcd.print(relay_state ? "ON" : "OFF");
+        
+        lcd.setCursor(15, 1);
+
       }
       else if (internal_temp <= -40.0){
+        digitalWrite(relay, HIGH);
         running = false;
+        
         Serial.println("Thermocouple module is overcooled");
         Serial.print("Internal Temperature = ");
         Serial.println(internal_temp);
-        digitalWrite(relay, HIGH);
         Serial.println("Relay turned on");
+
+        lcd.setCursor(0, 0);
+        lcd.print("Module overcooled");
+
+        lcd.setCursor(0, 1);
+        lcd.print("Tint=");
+        lcd.print(internal_temp);
+        lcd.print("C;  ");
+        lcd.print(relay_state ? "ON" : "OFF");
+
       }
       else {
         running = true;
@@ -209,7 +233,7 @@ void desactive_relay(){
   }
 };
 void relay_activation(){
-     if (currentTemp <= targetTemp & relay_state == 0){
+     if (currentTemp <= targetTemp & relay_state == 0 & currentTemp < 300.00){
        Serial.println("Relay HIGH");
        digitalWrite(relay, HIGH);
        relay_state = 1;
@@ -240,8 +264,6 @@ void updateDisplay() {
   lcd.print("Target: ");
   lcd.print(targetTemp);
   lcd.print("C  ");
-  
-
   
   lcd.setCursor(15, 1);
 
