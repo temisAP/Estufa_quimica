@@ -247,10 +247,12 @@ void relay_activation(){
 
 void increaseTemperature() {
   targetTemp += 1.0;
+  Serial.println("Pressed increase button");
 }
 
 void decreaseTemperature() {
   targetTemp -= 1.0;
+  Serial.println("Pressed decrease button");
 }
 
 void updateDisplay() {
